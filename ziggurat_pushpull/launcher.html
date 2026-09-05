@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    :root { color-scheme: light dark; --accent:#f39a22; --panel:#24262b; --line:#555b66; }
+    * { box-sizing:border-box; }
+    body { margin:0; padding:16px; font-family:"Segoe UI",Tahoma,sans-serif; background:#1d1f23; color:#f3f4f6; }
+    h1 { margin:0 0 4px; font-size:20px; color:#ffb340; }
+    .sub { margin:0 0 14px; color:#b8bec9; font-size:12px; }
+    .modes { display:grid; grid-template-columns:1fr 1fr; gap:8px; direction:ltr; }
+    .mode { min-height:72px; padding:10px; border:2px solid #4d5360; border-radius:9px; background:#2a2d33; color:#fff; cursor:pointer; text-align:left; }
+    .mode:hover { border-color:#ffb340; background:#333740; }
+    .mode strong { display:block; font-size:14px; color:#ffd166; }
+    .mode span { display:block; margin-top:4px; color:#c6cbd4; font-size:11px; }
+    fieldset { margin:14px 0 0; padding:10px; border:1px solid var(--line); border-radius:9px; }
+    legend { padding:0 7px; color:#ffbf58; font-weight:600; }
+    label { display:grid; grid-template-columns:125px 1fr; align-items:center; gap:8px; margin:8px 0; font-size:12px; }
+    select,input { width:100%; padding:6px; border:1px solid #626a77; border-radius:5px; background:#30343b; color:#fff; }
+    .footer { display:flex; gap:8px; margin-top:14px; }
+    .save { flex:1; padding:9px; border:1px solid #717887; border-radius:7px; background:#343840; color:#fff; cursor:pointer; }
+    .hint { margin-top:12px; padding:10px; border-right:4px solid #20cfe0; background:#252a30; color:#cdd3dc; font-size:11px; line-height:1.8; }
+    kbd { padding:1px 5px; border:1px solid #737b89; border-radius:4px; background:#15171a; color:#ffe08a; direction:ltr; }
+  </style>
+</head>
+<body>
+  <h1>ZigguratPushPull</h1>
+  <p class="sub">ابزار و تنظیمات را انتخاب کن؛ سپس روی یکی از دکمه‌ها بزن.</p>
+  <div class="modes">
+    <button class="mode" onclick="launch('joint')"><strong>Joint Surface</strong><span>Offset یکپارچه و حفظ اتصال Faceها</span></button>
+    <button class="mode" onclick="launch('normal')"><strong>Individual Faces</strong><span>اکسترود مستقل در راستای Normal هر Face</span></button>
+    <button class="mode" onclick="launch('extrude')"><strong>Directional Extrude</strong><span>حفظ شکل سطح در یک راستای مشترک</span></button>
+    <button class="mode" onclick="launch('vector')"><strong>Free Vector</strong><span>جهت از Edge، Face، دو نقطه یا بردار قبلی</span></button>
+  </div>
+  <fieldset>
+    <legend>تنظیمات</legend>
+    <label>محدوده انتخاب<select id="selection_scope"><option>Surface</option><option>All connected</option><option>Single face</option></select></label>
+    <label>نوع خروجی<select id="finish"><option>Thicken</option><option>Offset surface</option></select></label>
+    <label>دیواره‌ها<select id="borders"><option>Contour</option><option>Grid</option><option>None</option></select></label>
+    <label>نحوه اعمال<select id="output_mode"><option>Create New Group</option><option>Modify Original</option></select></label>
+    <label>Component<select id="component_scope"><option>Make Unique</option><option>All Instances</option></select></label>
+    <label>Taper درصد<input id="taper_percent" type="number" min="0" max="1000" step="5" value="100"></label>
+    <label>محور پیش‌فرض<select id="vector_axis"><option>Red (X)</option><option>Green (Y)</option><option>Blue (Z)</option></select></label>
+    <label>نرم‌کردن لبه<select id="soften"><option>Yes</option><option>No</option></select></label>
+  </fieldset>
+  <div class="footer"><button class="save" onclick="save()">ذخیره تنظیمات</button></div>
+  <div class="hint">
+    <kbd>Tab</kbd> تغییر محدوده انتخاب · <kbd>Shift</kbd> افزودن · <kbd>Ctrl+Shift</kbd> حذف<br>
+    جهت‌ها: <kbd>→</kbd> قرمز · <kbd>←</kbd> سبز · <kbd>↑</kbd> آبی · <kbd>↓</kbd> آزاد<br>
+    در Free Vector: روی Edge یا Face کلیک کن؛ <kbd>V</kbd> انتخاب دو نقطه؛ <kbd>L</kbd> آخرین بردار.
+    در Individual و Directional Extrude: <kbd>T</kbd> تنظیم Taper سطح انتهایی.
+  </div>
+  <script>
+    const ids=['selection_scope','finish','borders','output_mode','component_scope','taper_percent','vector_axis','soften'];
+    function data(mode){ const out={mode}; ids.forEach(id=>out[id]=document.getElementById(id).value); return out; }
+    function launch(mode){ sketchup.launch(JSON.stringify(data(mode))); }
+    function save(){ sketchup.save(JSON.stringify(data('joint'))); }
+    window.setOptions=function(values){ ids.forEach(id=>{ if(values[id]!==undefined) document.getElementById(id).value=values[id]; }); };
+    document.addEventListener('DOMContentLoaded',()=>sketchup.ready());
+  </script>
+</body>
+</html>
